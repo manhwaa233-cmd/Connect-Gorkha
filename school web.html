@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 25.8.4.2 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;GorkhaConnect&lt;/title&gt;
+  &lt;style&gt;
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      text-align: center;
+    }
+    .container {
+      width: 350px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      margin-top: 50px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 90%;
+      padding: 8px;
+      margin: 5px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;div class=&quot;container&quot; id=&quot;loginPage&quot;&gt;
+  &lt;h2&gt;GorkhaConnect&lt;/h2&gt;
+  &lt;input type=&quot;text&quot; id=&quot;username&quot; placeholder=&quot;Username&quot;&gt;
+  &lt;input type=&quot;password&quot; id=&quot;password&quot; placeholder=&quot;Password&quot;&gt;
+  &lt;button onclick=&quot;login()&quot;&gt;Login&lt;/button&gt;
+  &lt;hr&gt;
+  &lt;button onclick=&quot;showStudentRegister()&quot;&gt;Create Student Account&lt;/button&gt;
+  &lt;button onclick=&quot;showTeacherRegister()&quot;&gt;Create Teacher Account&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;container&quot; id=&quot;registerPage&quot; style=&quot;display:none;&quot;&gt;
+  &lt;h3 id=&quot;registerTitle&quot;&gt;&lt;/h3&gt;
+  &lt;input type=&quot;text&quot; id=&quot;regUsername&quot; placeholder=&quot;Username&quot;&gt;
+  &lt;input type=&quot;password&quot; id=&quot;regPassword&quot; placeholder=&quot;Password&quot;&gt;
+  &lt;input type=&quot;password&quot; id=&quot;teacherCode&quot; placeholder=&quot;Enter Teacher Access Code&quot; style=&quot;display:none;&quot;&gt;
+  &lt;button onclick=&quot;register()&quot;&gt;Register&lt;/button&gt;
+  &lt;button onclick=&quot;goBack()&quot;&gt;Back&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;container&quot; id=&quot;dashboard&quot; style=&quot;display:none;&quot;&gt;
+  &lt;h2 id=&quot;welcome&quot;&gt;&lt;/h2&gt;
+  &lt;div id=&quot;teacherPanel&quot; style=&quot;display:none;&quot;&gt;
+    &lt;h3&gt;Teacher Panel&lt;/h3&gt;
+    &lt;input type=&quot;text&quot; id=&quot;noticeInput&quot; placeholder=&quot;Enter Notice&quot;&gt;
+    &lt;button onclick=&quot;addNotice()&quot;&gt;Post Notice&lt;/button&gt;
+
+    &lt;input type=&quot;text&quot; id=&quot;attendanceInput&quot; placeholder=&quot;Student Username&quot;&gt;
+    &lt;input type=&quot;number&quot; id=&quot;attendanceValue&quot; placeholder=&quot;Attendance %&quot;&gt;
+    &lt;button onclick=&quot;addAttendance()&quot;&gt;Update Attendance&lt;/button&gt;
+
+    &lt;input type=&quot;text&quot; id=&quot;marksStudent&quot; placeholder=&quot;Student Username&quot;&gt;
+    &lt;input type=&quot;number&quot; id=&quot;marksValue&quot; placeholder=&quot;Marks %&quot;&gt;
+    &lt;button onclick=&quot;addMarks()&quot;&gt;Update Marks&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div id=&quot;studentPanel&quot;&gt;
+    &lt;h3&gt;Your Data&lt;/h3&gt;
+    &lt;p id=&quot;studentAttendance&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;studentMarks&quot;&gt;&lt;/p&gt;
+    &lt;h4&gt;Notices:&lt;/h4&gt;
+    &lt;div id=&quot;notices&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;button onclick=&quot;logout()&quot;&gt;Logout&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const TEACHER_SECRET = &quot;9858&quot;; // Hidden teacher access code
+
+let currentUser = &quot;&quot;;
+let currentRole = &quot;&quot;;
+
+function showStudentRegister(){
+  document.getElementById(&quot;loginPage&quot;).style.display=&quot;none&quot;;
+  document.getElementById(&quot;registerPage&quot;).style.display=&quot;block&quot;;
+  document.getElementById(&quot;registerTitle&quot;).innerText=&quot;Student Registration&quot;;
+  document.getElementById(&quot;teacherCode&quot;).style.display=&quot;none&quot;;
+  currentRole=&quot;student&quot;;
+}
+
+function showTeacherRegister(){
+  document.getElementById(&quot;loginPage&quot;).style.display=&quot;none&quot;;
+  document.getElementById(&quot;registerPage&quot;).style.display=&quot;block&quot;;
+  document.getElementById(&quot;registerTitle&quot;).innerText=&quot;Teacher Registration&quot;;
+  document.getElementById(&quot;teacherCode&quot;).style.display=&quot;block&quot;;
+  currentRole=&quot;teacher&quot;;
+}
+
+function goBack(){
+  document.getElementById(&quot;registerPage&quot;).style.display=&quot;none&quot;;
+  document.getElementById(&quot;loginPage&quot;).style.display=&quot;block&quot;;
+}
+
+function register(){
+  let user=document.getElementById(&quot;regUsername&quot;).value;
+  let pass=document.getElementById(&quot;regPassword&quot;).value;
+
+  if(currentRole==&quot;teacher&quot;){
+    let code=document.getElementById(&quot;teacherCode&quot;).value;
+    if(code !== TEACHER_SECRET){
+      alert(&quot;Invalid Teacher Code&quot;);
+      return;
+    }
+  }
+
+  localStorage.setItem(user, JSON.stringify({
+    password:pass,
+    role:currentRole,
+    attendance:0,
+    marks:0
+  }));
+
+  alert(&quot;Account Created!&quot;);
+  goBack();
+}
+
+function login(){
+  let user=document.getElementById(&quot;username&quot;).value;
+  let pass=document.getElementById(&quot;password&quot;).value;
+  let data=JSON.parse(localStorage.getItem(user));
+
+  if(data &amp;&amp; data.password==pass){
+    currentUser=user;
+    currentRole=data.role;
+    showDashboard();
+  } else {
+    alert(&quot;Invalid Login&quot;);
+  }
+}
+
+function showDashboard(){
+  document.getElementById(&quot;loginPage&quot;).style.display=&quot;none&quot;;
+  document.getElementById(&quot;dashboard&quot;).style.display=&quot;block&quot;;
+  document.getElementById(&quot;welcome&quot;).innerText=&quot;Welcome &quot;+currentUser;
+
+  if(currentRole==&quot;teacher&quot;){
+    document.getElementById(&quot;teacherPanel&quot;).style.display=&quot;block&quot;;
+    document.getElementById(&quot;studentPanel&quot;).style.display=&quot;none&quot;;
+  } else {
+    document.getElementById(&quot;teacherPanel&quot;).style.display=&quot;none&quot;;
+    document.getElementById(&quot;studentPanel&quot;).style.display=&quot;block&quot;;
+    loadStudentData();
+  }
+}
+
+function addNotice(){
+  let notice=document.getElementById(&quot;noticeInput&quot;).value;
+  let allNotices=JSON.parse(localStorage.getItem(&quot;notices&quot;))||[];
+  allNotices.push(notice);
+  localStorage.setItem(&quot;notices&quot;,JSON.stringify(allNotices));
+  alert(&quot;Notice Posted&quot;);
+}
+
+function addAttendance(){
+  let student=document.getElementById(&quot;attendanceInput&quot;).value;
+  let value=document.getElementById(&quot;attendanceValue&quot;).value;
+  let data=JSON.parse(localStorage.getItem(student));
+  if(data){
+    data.attendance=value;
+    localStorage.setItem(student,JSON.stringify(data));
+    alert(&quot;Attendance Updated&quot;);
+  }
+}
+
+function addMarks(){
+  let student=document.getElementById(&quot;marksStudent&quot;).value;
+  let value=document.getElementById(&quot;marksValue&quot;).value;
+  let data=JSON.parse(localStorage.getItem(student));
+  if(data){
+    data.marks=value;
+    localStorage.setItem(student,JSON.stringify(data));
+    alert(&quot;Marks Updated&quot;);
+  }
+}
+
+function loadStudentData(){
+  let data=JSON.parse(localStorage.getItem(currentUser));
+  document.getElementById(&quot;studentAttendance&quot;).innerText=&quot;Attendance: &quot;+data.attendance+&quot;%&quot;;
+  document.getElementById(&quot;studentMarks&quot;).innerText=&quot;Marks: &quot;+data.marks+&quot;%&quot;;
+
+  let notices=JSON.parse(localStorage.getItem(&quot;notices&quot;))||[];
+  document.getElementById(&quot;notices&quot;).innerHTML=notices.join(&quot;&lt;br&gt;&quot;);
+}
+
+function logout(){
+  location.reload();
+}
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</body>
+</html>
